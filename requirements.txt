@@ -1,0 +1,11 @@
+torch
+torchvision
+pytorch-lightning
+lightning
+torchmetrics[image]
+torch-fidelity
+lpips
+wandb
+numpy
+Pillow
+tqdm
