@@ -9,6 +9,14 @@ from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms, datasets
 
 
+def repeat_channels(t: Tensor) -> Tensor:
+    """Repeat single-channel MNIST tensors to 3 channels for the VAE.
+
+    Defined at module level so it is picklable by DataLoader worker processes.
+    """
+    return t.repeat(3, 1, 1)
+
+
 class CelebAFolderDataset(Dataset):
     def __init__(self, root: str, transform=None):
         self.root = Path(root)
@@ -72,13 +80,13 @@ class VAEDataset(LightningDataModule):
                 transforms.Resize(self.patch_size),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
-                transforms.Lambda(lambda t: t.repeat(3, 1, 1)),
+                transforms.Lambda(repeat_channels),
             ])
 
             val_transforms = transforms.Compose([
                 transforms.Resize(self.patch_size),
                 transforms.ToTensor(),
-                transforms.Lambda(lambda t: t.repeat(3, 1, 1)),
+                transforms.Lambda(repeat_channels),
             ])
 
             self.train_dataset = datasets.MNIST(

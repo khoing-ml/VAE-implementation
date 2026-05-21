@@ -1,37 +1,25 @@
 import os
 import random
+from pathlib import Path
 
 try:
     import numpy as np
 except ImportError:
     np = None
 
+CONFIG_PATH = Path(__file__).resolve().parent / "config" / "vae.yaml"
 
-config = {
-    "name": "VAE",
-    "in_channels": 3,
-    "latent_dim": 128,
-    "data_path": "data/",
-    "train_batch_size": 64,
-    "val_batch_size": 64,
-    "patch_size": 64,
-    "num_workers": 4,
-    "lr": 0.005,
-    "weight_decay": 0.0,
-    "scheduler_gamma": 0.95,
-    "kld_weight": 0.00025,
-    "manual_seed": 1265,
-    "gpus": [0, 1],
-    "max_epochs": 100,
-    "save_dirs": "logs/",
-    "eval_recon_metrics_every": 1,
-    "eval_recon_metrics_num_batches": 20,
-    "eval_fid_every": 5,
-    "fid_num_samples": 1000,
-}
 
-if config.get("gpus"):
-    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(str(gpu) for gpu in config["gpus"])
+def load_config(path: Path = CONFIG_PATH) -> dict:
+    try:
+        import yaml
+    except ImportError as exc:
+        raise RuntimeError(
+            "PyYAML is required to load config/vae.yaml. Install it with: pip install PyYAML"
+        ) from exc
+
+    with path.open("r", encoding="utf-8") as handle:
+        return yaml.safe_load(handle)
 
 
 def seed_everything(seed: int) -> None:
@@ -59,6 +47,11 @@ def main() -> None:
         raise RuntimeError(
             "Missing runtime dependency. Install torch, wandb, torchvision, and torchmetrics before running."
         ) from exc
+
+    config = load_config()
+
+    if config.get("gpus"):
+        os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(str(gpu) for gpu in config["gpus"])
 
     os.makedirs(config["save_dirs"], exist_ok=True)
 
@@ -93,6 +86,8 @@ def main() -> None:
         patch_size=config["patch_size"],
         num_workers=config["num_workers"],
         pin_memory=torch.cuda.is_available(),
+        dataset_type=config.get("dataset_type", "celeba"),
+        mnist_download=config.get("mnist_download", True),
     )
     data_module.setup()
 

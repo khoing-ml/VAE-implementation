@@ -1,0 +1,104 @@
+_wandb:
+    value:
+        cli_version: 0.27.0
+        e:
+            pw89wvam9k3fmbx91vmt2gkuuloosc9v:
+                codePath: run.py
+                codePathLocal: run.py
+                cpu_count: 12
+                cpu_count_logical: 16
+                cudaVersion: "13.2"
+                disk:
+                    /:
+                        total: "249776402432"
+                        used: "34273091584"
+                email: Khoi.NM235123@sis.hust.edu.vn
+                executable: /home/khoi/miniconda3/envs/vae/bin/python
+                git:
+                    commit: dddb180850324040c03003c2b9e6abda08e9dbaa
+                    remote: https://github.com/khoing-ml/VAE-implementation
+                gpu: NVIDIA GeForce RTX 3060 Laptop GPU
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 3840
+                      memoryTotal: "6442450944"
+                      name: NVIDIA GeForce RTX 3060 Laptop GPU
+                      uuid: GPU-98fbd5a6-bcf4-b1c5-e667-cccb801d9b94
+                host: khoi
+                memory:
+                    total: "15936991232"
+                os: Linux-7.0.0-15-generic-x86_64-with-glibc2.43
+                program: /home/khoi/Code/VAE/run.py
+                python: CPython 3.14.4
+                root: /home/khoi/Code/VAE
+                startedAt: "2026-05-21T16:28:06.549976Z"
+                writerId: pw89wvam9k3fmbx91vmt2gkuuloosc9v
+        m: []
+        python_version: 3.14.4
+        t:
+            "1":
+                - 1
+                - 9
+                - 41
+                - 103
+            "2":
+                - 1
+                - 9
+                - 41
+                - 103
+            "3":
+                - 3
+                - 13
+                - 16
+                - 61
+            "4": 3.14.4
+            "5": 0.27.0
+            "12": 0.27.0
+            "13": linux-x86_64
+data_path:
+    value: data/img_align_celeba/img_align_celeba
+dataset_type:
+    value: mnist
+eval_fid_every:
+    value: 5
+eval_recon_metrics_every:
+    value: 1
+eval_recon_metrics_num_batches:
+    value: 20
+fid_num_samples:
+    value: 1000
+gpus:
+    value:
+        - 0
+        - 1
+in_channels:
+    value: 3
+kld_weight:
+    value: 0.00025
+latent_dim:
+    value: 128
+lr:
+    value: 0.005
+manual_seed:
+    value: 1265
+max_epochs:
+    value: 100
+mnist_download:
+    value: true
+name:
+    value: VAE
+num_workers:
+    value: 4
+patch_size:
+    value: 64
+save_dirs:
+    value: logs/
+scheduler_gamma:
+    value: 0.95
+train_batch_size:
+    value: 64
+val_batch_size:
+    value: 64
+weight_decay:
+    value: 0

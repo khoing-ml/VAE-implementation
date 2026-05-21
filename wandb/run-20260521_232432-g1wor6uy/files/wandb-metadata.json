@@ -1,0 +1,40 @@
+{
+  "os": "Linux-7.0.0-15-generic-x86_64-with-glibc2.43",
+  "python": "CPython 3.14.4",
+  "startedAt": "2026-05-21T16:24:32.161021Z",
+  "program": "/home/khoi/Code/VAE/run.py",
+  "codePath": "run.py",
+  "codePathLocal": "run.py",
+  "git": {
+    "remote": "https://github.com/khoing-ml/VAE-implementation",
+    "commit": "dddb180850324040c03003c2b9e6abda08e9dbaa"
+  },
+  "email": "Khoi.NM235123@sis.hust.edu.vn",
+  "root": "/home/khoi/Code/VAE",
+  "host": "khoi",
+  "executable": "/home/khoi/miniconda3/envs/vae/bin/python",
+  "cpu_count": 12,
+  "cpu_count_logical": 16,
+  "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "249776402432",
+      "used": "34206072832"
+    }
+  },
+  "memory": {
+    "total": "15936991232"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "memoryTotal": "6442450944",
+      "cudaCores": 3840,
+      "architecture": "Ampere",
+      "uuid": "GPU-98fbd5a6-bcf4-b1c5-e667-cccb801d9b94"
+    }
+  ],
+  "cudaVersion": "13.2",
+  "writerId": "7f0lgg3q7mb37nkbtuxsyjq9y6bp5smk"
+}
