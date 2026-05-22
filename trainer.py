@@ -27,6 +27,7 @@ class VAETrainer:
         self.optimizer = torch.optim.Adam(
             self.model.parameters(),
             lr=self.config["lr"],
+            betas=(0.9, 0.999),
             weight_decay=self.config["weight_decay"]
         )
 
