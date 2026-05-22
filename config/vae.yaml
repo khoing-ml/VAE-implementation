@@ -4,14 +4,14 @@ latent_dim: 128
 dataset_type: celeba
 mnist_download: False
 data_path: /kaggle/input/datasets/jessicali9530/celeba-dataset/img_align_celeba/img_align_celeba
-train_batch_size: 64
-val_batch_size: 64
-patch_size: 8
+train_batch_size: 128 
+val_batch_size: 128
+patch_size: 64
 num_workers: 4
 lr: 0.0005
 weight_decay: 0.0
 scheduler_gamma: 0.95
-kld_weight: 0.00025
+kld_weight: 0.0005
 manual_seed: 1265
 gpus:
   - 0
