@@ -8,7 +8,7 @@ train_batch_size: 64
 val_batch_size: 64
 patch_size: 64
 num_workers: 4
-lr: 0.005
+lr: 1e-4
 weight_decay: 0.0
 scheduler_gamma: 0.95
 kld_weight: 0.00025
