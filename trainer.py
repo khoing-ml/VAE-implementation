@@ -68,6 +68,9 @@ class VAETrainer:
             )
             loss = loss_dict["loss"]
             loss.backward()
+            # gradient clipping to avoid exploding gradients causing NaNs
+            max_norm = self.config.get("grad_clip", 1.0)
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
             self.optimizer.step()
             self.global_step += 1
             recons_loss = loss_dict["Reconstruction_Loss"]

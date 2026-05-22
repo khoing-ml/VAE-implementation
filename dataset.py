@@ -80,12 +80,14 @@ class VAEDataset(LightningDataModule):
                 transforms.Resize(self.patch_size),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
+                transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
                 transforms.Lambda(repeat_channels),
             ])
 
             val_transforms = transforms.Compose([
                 transforms.Resize(self.patch_size),
                 transforms.ToTensor(),
+                transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
                 transforms.Lambda(repeat_channels),
             ])
 
@@ -108,12 +110,14 @@ class VAEDataset(LightningDataModule):
                 transforms.CenterCrop(148),
                 transforms.Resize(self.patch_size),
                 transforms.ToTensor(),
+                transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
             ])
 
             val_transforms = transforms.Compose([
                 transforms.CenterCrop(148),
                 transforms.Resize(self.patch_size),
                 transforms.ToTensor(),
+                transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
             ])
 
             full_train_dataset = CelebAFolderDataset(

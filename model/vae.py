@@ -67,7 +67,9 @@ class VAE(nn.Module):
         return mu, logvar
 
     def reparameterize(self, mu: Tensor, logvar: Tensor) -> Tensor:
-        std = torch.exp(0.5 * logvar)
+        # clamp log-variance to avoid numerical overflow when exponentiating
+        logvar_clamped = torch.clamp(logvar, min=-30.0, max=20.0)
+        std = torch.exp(0.5 * logvar_clamped)
         eps = torch.randn_like(std)
         return mu + eps * std
 
@@ -92,8 +94,10 @@ class VAE(nn.Module):
         kld_weight = kwargs["M_N"]
 
         recons_loss = torch.nn.functional.mse_loss(recons, input_x)
+        # clamp logvar used in KLD to keep values numerically stable
+        logvar_clamped = torch.clamp(logvar, min=-30.0, max=20.0)
         kld_loss = torch.mean(
-            -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp(), dim=1),
+            -0.5 * torch.sum(1 + logvar_clamped - mu.pow(2) - logvar_clamped.exp(), dim=1),
             dim=0,
         )
         loss = recons_loss + kld_loss * kld_weight
