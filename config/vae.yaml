@@ -11,7 +11,7 @@ num_workers: 4
 lr: 0.005
 weight_decay: 0.0
 scheduler_gamma: 0.95
-kld_weight: 0.000025
+kld_weight: 0.00001
 manual_seed: 1265
 gpus:
   - 0
