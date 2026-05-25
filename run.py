@@ -74,6 +74,9 @@ def main() -> None:
         latent_dim=config["latent_dim"],
     )
 
+    if config.get("upgrade_vae", False):
+        model.upgrade_vae()
+
     if torch.cuda.is_available() and num_gpus > 1:
         model = torch.nn.DataParallel(model)
 

@@ -4,6 +4,58 @@ import torch
 from torch import Tensor, nn
 
 
+class ResidualDownBlock(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int) -> None:
+        super().__init__()
+        self.main = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(out_channels),
+        )
+        self.skip = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=2, padding=0),
+            nn.BatchNorm2d(out_channels),
+        )
+        self.activation = nn.ReLU(inplace=True)
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self.activation(self.main(x) + self.skip(x))
+
+
+class ResidualUpBlock(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int) -> None:
+        super().__init__()
+        self.main = nn.Sequential(
+            nn.ConvTranspose2d(
+                in_channels,
+                out_channels,
+                kernel_size=4,
+                stride=2,
+                padding=1,
+            ),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(out_channels),
+        )
+        self.skip = nn.Sequential(
+            nn.ConvTranspose2d(
+                in_channels,
+                out_channels,
+                kernel_size=4,
+                stride=2,
+                padding=1,
+            ),
+            nn.BatchNorm2d(out_channels),
+        )
+        self.activation = nn.ReLU(inplace=True)
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self.activation(self.main(x) + self.skip(x))
+
+
 class VAE(nn.Module):
     def __init__(
         self,
@@ -13,13 +65,26 @@ class VAE(nn.Module):
         image_size: int = 64,
         downsample_factor: int = 8,
         hidden_dims=None,
+        residual: bool = False,
         **kwargs,
     ) -> None:
         super().__init__()
+        self.in_channels = in_channels
         self.z_dim = latent_dim
+        self.flatten = nn.Flatten()
+        self.decoder_input = nn.Sequential(
+            nn.Linear(latent_dim, 256 * 8 * 8),
+            nn.ReLU(inplace=True),
+        )
 
+        self.use_residual = False
+        self._build_plain_architecture()
+        if residual:
+            self.upgrade_vae()
+
+    def _build_plain_architecture(self) -> None:
         self.encoder = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=5, stride=2, padding=2),
+            nn.Conv2d(self.in_channels, 64, kernel_size=5, stride=2, padding=2),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 128, kernel_size=5, stride=2, padding=2),
@@ -33,14 +98,8 @@ class VAE(nn.Module):
             nn.ReLU(inplace=True),
         )
 
-        self.flatten = nn.Flatten()
-        self.fc_mu = nn.Linear(512 * 4 * 4, latent_dim)
-        self.fc_logvar = nn.Linear(512 * 4 * 4, latent_dim)
-
-        self.decoder_input = nn.Sequential(
-            nn.Linear(latent_dim, 256 * 8 * 8),
-            nn.ReLU(inplace=True),
-        )
+        self.fc_mu = nn.Linear(512 * 4 * 4, self.z_dim)
+        self.fc_logvar = nn.Linear(512 * 4 * 4, self.z_dim)
 
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(256, 256, kernel_size=5, stride=2, padding=2, output_padding=1),
@@ -55,9 +114,36 @@ class VAE(nn.Module):
         )
 
         self.final_layer = nn.Sequential(
-            nn.ConvTranspose2d(32, 3, kernel_size=5, stride=1, padding=2),
+            nn.ConvTranspose2d(32, self.in_channels, kernel_size=5, stride=1, padding=2),
             nn.Tanh(),
         )
+
+    def _build_residual_architecture(self) -> None:
+        self.encoder = nn.Sequential(
+            ResidualDownBlock(self.in_channels, 64),
+            ResidualDownBlock(64, 128),
+            ResidualDownBlock(128, 256),
+            ResidualDownBlock(256, 512),
+        )
+
+        self.fc_mu = nn.Linear(512 * 4 * 4, self.z_dim)
+        self.fc_logvar = nn.Linear(512 * 4 * 4, self.z_dim)
+
+        self.decoder = nn.Sequential(
+            ResidualUpBlock(256, 256),
+            ResidualUpBlock(256, 128),
+            ResidualUpBlock(128, 32),
+        )
+
+        self.final_layer = nn.Sequential(
+            nn.ConvTranspose2d(32, self.in_channels, kernel_size=5, stride=1, padding=2),
+            nn.Tanh(),
+        )
+
+    def upgrade_vae(self) -> "VAE":
+        self.use_residual = True
+        self._build_residual_architecture()
+        return self
 
     def encode(self, x: Tensor) -> Tuple[Tensor, Tensor]:
         x = self.encoder(x)
